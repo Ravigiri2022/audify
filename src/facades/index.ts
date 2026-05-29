@@ -1,0 +1,7 @@
+export { ffmpegFacade } from './ffmpeg.facade'
+export { whisperFacade } from './whisper.facade'
+export { wavesurferFacade } from './wavesurfer.facade'
+export { metadataFacade } from './metadata.facade'
+export { bpmFacade } from './bpm.facade'
+export { recorderFacade } from './recorder.facade'
+export { equalizerFacade, DEFAULT_EQ_FREQUENCIES } from './equalizer.facade'

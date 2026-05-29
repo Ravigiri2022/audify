@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --brand-primary: 258 90% 62%;
+  --brand-secondary: 210 100% 56%;
+
+  --bg-base: 222 20% 7%;
+  --bg-surface: 222 16% 11%;
+  --bg-elevated: 222 14% 15%;
+  --bg-border: 222 12% 22%;
+
+  --text-primary: 0 0% 98%;
+  --text-secondary: 222 10% 65%;
+  --text-muted: 222 8% 45%;
+
+  --success: 142 76% 45%;
+  --warning: 38 92% 50%;
+  --error: 0 84% 60%;
+  --info: 199 89% 48%;
+
+  --radius: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+
+  --shadow-sm: 0 1px 3px hsl(0 0% 0% / 0.3);
+  --shadow-md: 0 4px 16px hsl(0 0% 0% / 0.4);
+  --shadow-glow: 0 0 32px hsl(var(--brand-primary) / 0.18);
+}
+
+[data-theme='light'] {
+  --bg-base: 0 0% 97%;
+  --bg-surface: 0 0% 100%;
+  --bg-elevated: 222 20% 95%;
+  --bg-border: 222 15% 86%;
+  --text-primary: 222 25% 8%;
+  --text-secondary: 222 15% 35%;
+  --text-muted: 222 10% 55%;
+  --shadow-sm: 0 1px 3px hsl(0 0% 0% / 0.08);
+  --shadow-md: 0 4px 16px hsl(0 0% 0% / 0.12);
+}
+
+* {
+  border-color: hsl(var(--bg-border));
+}
+
+body {
+  background-color: hsl(var(--bg-base));
+  color: hsl(var(--text-primary));
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+@layer utilities {
+  .text-gradient {
+    background: linear-gradient(135deg, hsl(var(--brand-primary)), hsl(var(--brand-secondary)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .surface {
+    background-color: hsl(var(--bg-surface));
+    border: 1px solid hsl(var(--bg-border));
+  }
+
+  .elevated {
+    background-color: hsl(var(--bg-elevated));
+    border: 1px solid hsl(var(--bg-border));
+  }
+
+  .glow-brand {
+    box-shadow: var(--shadow-glow);
+  }
+}
+
+/* WaveSurfer canvas override */
+wave {
+  border-radius: var(--radius-lg) !important;
+  overflow: hidden !important;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: hsl(var(--bg-border)); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: hsl(var(--text-muted)); }
