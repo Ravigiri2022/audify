@@ -1,0 +1,12 @@
+{
+  "name": "Audflo",
+  "short_name": "Audflo",
+  "description": "Free online audio toolkit — convert, trim, transcribe and more in your browser.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0d1117",
+  "theme_color": "#7c3aed",
+  "icons": [
+    { "src": "/favicon.ico", "sizes": "any", "type": "image/x-icon" }
+  ]
+}

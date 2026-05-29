@@ -11,6 +11,9 @@ import { Footer } from '@/components/common/Footer'
 import ToolCard from '@/components/common/ToolCard'
 import { TOOLS, TOOL_CATEGORIES } from '@/lib/constants'
 import { fadeUp, stagger, easeOut } from '@/lib/motion'
+import { getLandingJsonLd } from '@/lib/seo'
+
+const JSON_LD = getLandingJsonLd()
 
 const ALL_CATEGORIES = ['All', ...TOOL_CATEGORIES] as const
 type CategoryFilter = (typeof ALL_CATEGORIES)[number]
@@ -24,6 +27,14 @@ export default function LandingPage() {
       : TOOLS.filter((t) => t.category === activeCategory)
 
   return (
+    <>
+      {JSON_LD.map((schema, i) => (
+        <script
+          key={i}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        />
+      ))}
     <div className="min-h-screen bg-bg-base">
       <Navbar />
 
@@ -309,5 +320,6 @@ export default function LandingPage() {
 
       <Footer />
     </div>
+    </>
   )
 }

@@ -93,7 +93,7 @@ export default function AuthPage() {
               <AudioLines className="h-6 w-6 text-brand" />
             </div>
             <div className="text-center">
-              <h1 className="text-xl font-bold text-text-primary">Welcome to Audify</h1>
+              <h1 className="text-xl font-bold text-text-primary">Welcome to Audflo</h1>
               <p className="mt-1 text-sm text-text-secondary">Sign in to save your work and unlock Pro features</p>
             </div>
           </motion.div>

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 
 function getInitialTheme(): 'dark' | 'light' {
   if (typeof window === 'undefined') return 'dark'
-  const stored = localStorage.getItem('audify-theme')
+  const stored = localStorage.getItem('audflo-theme')
   if (stored === 'light' || stored === 'dark') return stored
   return 'dark'
 }
@@ -24,7 +24,7 @@ export function ThemeToggle() {
     const next = theme === 'dark' ? 'light' : 'dark'
     setTheme(next)
     document.documentElement.setAttribute('data-theme', next)
-    localStorage.setItem('audify-theme', next)
+    localStorage.setItem('audflo-theme', next)
   }
 
   return (

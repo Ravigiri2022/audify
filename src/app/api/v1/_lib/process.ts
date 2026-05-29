@@ -25,8 +25,8 @@ export async function processWithFFmpeg(
 ): Promise<Buffer> {
   const id = randomBytes(8).toString('hex')
   const tmpDir = os.tmpdir()
-  const inputPath = path.join(tmpDir, `audify_in_${id}.${inputExt}`)
-  const outputPath = path.join(tmpDir, `audify_out_${id}.${outputExt}`)
+  const inputPath = path.join(tmpDir, `audflo_in_${id}.${inputExt}`)
+  const outputPath = path.join(tmpDir, `audflo_out_${id}.${outputExt}`)
 
   // Write the input buffer to a temporary file
   await fs.writeFile(inputPath, inputBuffer)

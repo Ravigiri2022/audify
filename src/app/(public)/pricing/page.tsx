@@ -82,7 +82,7 @@ const FAQS = [
   },
   {
     q: 'Is there a free trial for Pro?',
-    a: 'The Free plan gives you full access to all 19 tools with a daily limit — so you can fully evaluate Audify before upgrading.',
+    a: 'The Free plan gives you full access to all 19 tools with a daily limit — so you can fully evaluate Audflo before upgrading.',
   },
   {
     q: 'What counts as an "operation"?',
