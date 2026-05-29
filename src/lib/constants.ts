@@ -24,8 +24,8 @@ export const TOOLS: Tool[] = [
 
 export const TOOL_CATEGORIES = ['Convert', 'Edit', 'Enhance', 'Analyze', 'Create'] as const
 
-export const FFMPEG_CORE_URL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm/ffmpeg-core.js'
-export const FFMPEG_WASM_URL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm/ffmpeg-core.wasm'
+export const FFMPEG_CORE_URL = '/ffmpeg/ffmpeg-core.js'
+export const FFMPEG_WASM_URL = '/ffmpeg/ffmpeg-core.wasm'
 
 export const SUPPORTED_AUDIO_FORMATS = [
   'audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/wave',

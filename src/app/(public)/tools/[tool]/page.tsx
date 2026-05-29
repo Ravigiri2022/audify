@@ -36,16 +36,17 @@ import { fadeUp, easeOut } from '@/lib/motion'
 
 // ── Helper: ensure ffmpeg is loaded ─────────────────────────────────────────
 async function ensureFFmpeg(
-  setStatus: (s: 'loading_wasm' | 'processing') => void,
+  setStatus: (s: 'loading_wasm' | 'processing' | 'idle' | 'error') => void,
   setProgress: (p: number, label?: string) => void
 ) {
+  if (ffmpegFacade.isLoaded()) {
+    setStatus('processing')
+    setProgress(0, 'Processing…')
+    return
+  }
   setStatus('loading_wasm')
   setProgress(0, 'Loading audio engine…')
-  try {
-    await ffmpegFacade.load((p) => setProgress(p * 0.8, 'Loading audio engine…'))
-  } catch {
-    // already loaded — ignore
-  }
+  await ffmpegFacade.load((p) => setProgress(p * 0.8, 'Loading audio engine…'))
   setStatus('processing')
   setProgress(0, 'Processing…')
 }
@@ -58,10 +59,14 @@ function ConvertPanel() {
     <ConverterOptions
       onProcess={async (format, bitrate) => {
         if (!store.inputFiles[0]) { store.setError('No file selected'); return }
-        await ensureFFmpeg(store.setStatus, store.setProgress)
-        const blob = await ffmpegFacade.convert(store.inputFiles[0], format, bitrate)
-        const base = store.inputFiles[0].name.replace(/\.[^/.]+$/, '')
-        store.setResult(blob, `${base}_converted.${format}`)
+        try {
+          await ensureFFmpeg(store.setStatus, store.setProgress)
+          const blob = await ffmpegFacade.convert(store.inputFiles[0], format, bitrate)
+          const base = store.inputFiles[0].name.replace(/\.[^/.]+$/, '')
+          store.setResult(blob, `${base}_converted.${format}`)
+        } catch (err) {
+          store.setError(err instanceof Error ? err.message : String(err))
+        }
       }}
     />
   )
@@ -73,11 +78,15 @@ function TrimPanel() {
     <TrimmerOptions
       onProcess={async (start, end) => {
         if (!store.inputFiles[0]) { store.setError('No file selected'); return }
-        await ensureFFmpeg(store.setStatus, store.setProgress)
-        const blob = await ffmpegFacade.trim(store.inputFiles[0], start, end)
-        const ext = store.inputFiles[0].name.split('.').pop() ?? 'mp3'
-        const base = store.inputFiles[0].name.replace(/\.[^/.]+$/, '')
-        store.setResult(blob, `${base}_trimmed.${ext}`)
+        try {
+          await ensureFFmpeg(store.setStatus, store.setProgress)
+          const blob = await ffmpegFacade.trim(store.inputFiles[0], start, end)
+          const ext = store.inputFiles[0].name.split('.').pop() ?? 'mp3'
+          const base = store.inputFiles[0].name.replace(/\.[^/.]+$/, '')
+          store.setResult(blob, `${base}_trimmed.${ext}`)
+        } catch (err) {
+          store.setError(err instanceof Error ? err.message : String(err))
+        }
       }}
     />
   )
@@ -89,10 +98,14 @@ function CompressPanel() {
     <CompressorOptions
       onProcess={async (bitrateKbps) => {
         if (!store.inputFiles[0]) { store.setError('No file selected'); return }
-        await ensureFFmpeg(store.setStatus, store.setProgress)
-        const blob = await ffmpegFacade.compress(store.inputFiles[0], bitrateKbps)
-        const base = store.inputFiles[0].name.replace(/\.[^/.]+$/, '')
-        store.setResult(blob, `${base}_compressed.mp3`)
+        try {
+          await ensureFFmpeg(store.setStatus, store.setProgress)
+          const blob = await ffmpegFacade.compress(store.inputFiles[0], bitrateKbps)
+          const base = store.inputFiles[0].name.replace(/\.[^/.]+$/, '')
+          store.setResult(blob, `${base}_compressed.mp3`)
+        } catch (err) {
+          store.setError(err instanceof Error ? err.message : String(err))
+        }
       }}
     />
   )
@@ -104,9 +117,13 @@ function MergePanel() {
     <MergerOptions
       onProcess={async (crossfadeSec) => {
         if (store.inputFiles.length < 2) { store.setError('Add at least 2 files to merge'); return }
-        await ensureFFmpeg(store.setStatus, store.setProgress)
-        const blob = await ffmpegFacade.merge(store.inputFiles, crossfadeSec || undefined)
-        store.setResult(blob, 'merged_output.mp3')
+        try {
+          await ensureFFmpeg(store.setStatus, store.setProgress)
+          const blob = await ffmpegFacade.merge(store.inputFiles, crossfadeSec || undefined)
+          store.setResult(blob, 'merged_output.mp3')
+        } catch (err) {
+          store.setError(err instanceof Error ? err.message : String(err))
+        }
       }}
     />
   )
@@ -118,18 +135,21 @@ function SplitPanel() {
     <SplitterOptions
       onProcess={async (timestamps) => {
         if (!store.inputFiles[0]) { store.setError('No file selected'); return }
-        await ensureFFmpeg(store.setStatus, store.setProgress)
-        const blobs = await ffmpegFacade.split(store.inputFiles[0], timestamps)
-        // Download each segment and report the first as the "result"
-        const base = store.inputFiles[0].name.replace(/\.[^/.]+$/, '')
-        blobs.forEach((blob, i) => {
-          const a = document.createElement('a')
-          a.href = URL.createObjectURL(blob)
-          a.download = `${base}_part${i + 1}.mp3`
-          a.click()
-          setTimeout(() => URL.revokeObjectURL(a.href), 1000)
-        })
-        store.setResult(blobs[0], `${base}_part1.mp3`)
+        try {
+          await ensureFFmpeg(store.setStatus, store.setProgress)
+          const blobs = await ffmpegFacade.split(store.inputFiles[0], timestamps)
+          const base = store.inputFiles[0].name.replace(/\.[^/.]+$/, '')
+          blobs.forEach((blob, i) => {
+            const a = document.createElement('a')
+            a.href = URL.createObjectURL(blob)
+            a.download = `${base}_part${i + 1}.mp3`
+            a.click()
+            setTimeout(() => URL.revokeObjectURL(a.href), 1000)
+          })
+          store.setResult(blobs[0], `${base}_part1.mp3`)
+        } catch (err) {
+          store.setError(err instanceof Error ? err.message : String(err))
+        }
       }}
     />
   )
@@ -141,10 +161,14 @@ function NormalizePanel() {
     <NormalizerOptions
       onProcess={async (targetLufs) => {
         if (!store.inputFiles[0]) { store.setError('No file selected'); return }
-        await ensureFFmpeg(store.setStatus, store.setProgress)
-        const blob = await ffmpegFacade.normalize(store.inputFiles[0], targetLufs)
-        const base = store.inputFiles[0].name.replace(/\.[^/.]+$/, '')
-        store.setResult(blob, `${base}_normalized.mp3`)
+        try {
+          await ensureFFmpeg(store.setStatus, store.setProgress)
+          const blob = await ffmpegFacade.normalize(store.inputFiles[0], targetLufs)
+          const base = store.inputFiles[0].name.replace(/\.[^/.]+$/, '')
+          store.setResult(blob, `${base}_normalized.mp3`)
+        } catch (err) {
+          store.setError(err instanceof Error ? err.message : String(err))
+        }
       }}
     />
   )
@@ -156,10 +180,14 @@ function SilenceRemovePanel() {
     <SilenceRemoverOptions
       onProcess={async (thresholdDb, minDuration) => {
         if (!store.inputFiles[0]) { store.setError('No file selected'); return }
-        await ensureFFmpeg(store.setStatus, store.setProgress)
-        const blob = await ffmpegFacade.removeSilence(store.inputFiles[0], thresholdDb, minDuration)
-        const base = store.inputFiles[0].name.replace(/\.[^/.]+$/, '')
-        store.setResult(blob, `${base}_silence_removed.mp3`)
+        try {
+          await ensureFFmpeg(store.setStatus, store.setProgress)
+          const blob = await ffmpegFacade.removeSilence(store.inputFiles[0], thresholdDb, minDuration)
+          const base = store.inputFiles[0].name.replace(/\.[^/.]+$/, '')
+          store.setResult(blob, `${base}_silence_removed.mp3`)
+        } catch (err) {
+          store.setError(err instanceof Error ? err.message : String(err))
+        }
       }}
     />
   )
@@ -171,10 +199,14 @@ function SpeedPanel() {
     <SpeedChangerOptions
       onProcess={async (multiplier) => {
         if (!store.inputFiles[0]) { store.setError('No file selected'); return }
-        await ensureFFmpeg(store.setStatus, store.setProgress)
-        const blob = await ffmpegFacade.changeSpeed(store.inputFiles[0], multiplier)
-        const base = store.inputFiles[0].name.replace(/\.[^/.]+$/, '')
-        store.setResult(blob, `${base}_${multiplier}x.mp3`)
+        try {
+          await ensureFFmpeg(store.setStatus, store.setProgress)
+          const blob = await ffmpegFacade.changeSpeed(store.inputFiles[0], multiplier)
+          const base = store.inputFiles[0].name.replace(/\.[^/.]+$/, '')
+          store.setResult(blob, `${base}_${multiplier}x.mp3`)
+        } catch (err) {
+          store.setError(err instanceof Error ? err.message : String(err))
+        }
       }}
     />
   )
@@ -186,11 +218,15 @@ function PitchPanel() {
     <PitchShifterOptions
       onProcess={async (semitones) => {
         if (!store.inputFiles[0]) { store.setError('No file selected'); return }
-        await ensureFFmpeg(store.setStatus, store.setProgress)
-        const blob = await ffmpegFacade.shiftPitch(store.inputFiles[0], semitones)
-        const sign = semitones >= 0 ? '+' : ''
-        const base = store.inputFiles[0].name.replace(/\.[^/.]+$/, '')
-        store.setResult(blob, `${base}_pitch${sign}${semitones}.mp3`)
+        try {
+          await ensureFFmpeg(store.setStatus, store.setProgress)
+          const blob = await ffmpegFacade.shiftPitch(store.inputFiles[0], semitones)
+          const sign = semitones >= 0 ? '+' : ''
+          const base = store.inputFiles[0].name.replace(/\.[^/.]+$/, '')
+          store.setResult(blob, `${base}_pitch${sign}${semitones}.mp3`)
+        } catch (err) {
+          store.setError(err instanceof Error ? err.message : String(err))
+        }
       }}
     />
   )
@@ -202,10 +238,14 @@ function FadePanel() {
     <FadeOptions
       onProcess={async (fadeInSec, fadeOutSec) => {
         if (!store.inputFiles[0]) { store.setError('No file selected'); return }
-        await ensureFFmpeg(store.setStatus, store.setProgress)
-        const blob = await ffmpegFacade.fade(store.inputFiles[0], fadeInSec, fadeOutSec)
-        const base = store.inputFiles[0].name.replace(/\.[^/.]+$/, '')
-        store.setResult(blob, `${base}_faded.mp3`)
+        try {
+          await ensureFFmpeg(store.setStatus, store.setProgress)
+          const blob = await ffmpegFacade.fade(store.inputFiles[0], fadeInSec, fadeOutSec)
+          const base = store.inputFiles[0].name.replace(/\.[^/.]+$/, '')
+          store.setResult(blob, `${base}_faded.mp3`)
+        } catch (err) {
+          store.setError(err instanceof Error ? err.message : String(err))
+        }
       }}
     />
   )
@@ -217,10 +257,14 @@ function StereoMonoPanel() {
     <StereoMonoOptions
       onProcess={async () => {
         if (!store.inputFiles[0]) { store.setError('No file selected'); return }
-        await ensureFFmpeg(store.setStatus, store.setProgress)
-        const blob = await ffmpegFacade.stereoToMono(store.inputFiles[0])
-        const base = store.inputFiles[0].name.replace(/\.[^/.]+$/, '')
-        store.setResult(blob, `${base}_mono.mp3`)
+        try {
+          await ensureFFmpeg(store.setStatus, store.setProgress)
+          const blob = await ffmpegFacade.stereoToMono(store.inputFiles[0])
+          const base = store.inputFiles[0].name.replace(/\.[^/.]+$/, '')
+          store.setResult(blob, `${base}_mono.mp3`)
+        } catch (err) {
+          store.setError(err instanceof Error ? err.message : String(err))
+        }
       }}
     />
   )
@@ -232,10 +276,14 @@ function NoiseRemovePanel() {
     <NoiseRemoverOptions
       onProcess={async (strength) => {
         if (!store.inputFiles[0]) { store.setError('No file selected'); return }
-        await ensureFFmpeg(store.setStatus, store.setProgress)
-        const blob = await ffmpegFacade.removeNoise(store.inputFiles[0], strength)
-        const base = store.inputFiles[0].name.replace(/\.[^/.]+$/, '')
-        store.setResult(blob, `${base}_denoised.mp3`)
+        try {
+          await ensureFFmpeg(store.setStatus, store.setProgress)
+          const blob = await ffmpegFacade.removeNoise(store.inputFiles[0], strength)
+          const base = store.inputFiles[0].name.replace(/\.[^/.]+$/, '')
+          store.setResult(blob, `${base}_denoised.mp3`)
+        } catch (err) {
+          store.setError(err instanceof Error ? err.message : String(err))
+        }
       }}
     />
   )
@@ -247,17 +295,21 @@ function TranscribePanel() {
     <TranscriptionOptions
       onProcess={async (modelSize, language) => {
         if (!store.inputFiles[0]) { store.setError('No file selected'); return }
-        store.setStatus('processing')
-        store.setProgress(0, 'Loading Whisper model…')
-        await whisperFacade.load(modelSize, (p, label) => store.setProgress(p, label))
-        store.setProgress(50, 'Transcribing…')
-        const result = await whisperFacade.transcribe(
-          store.inputFiles[0],
-          language || undefined
-        )
-        const blob = new Blob([result.text], { type: 'text/plain' })
-        const base = store.inputFiles[0].name.replace(/\.[^/.]+$/, '')
-        store.setResult(blob, `${base}_transcript.txt`)
+        try {
+          store.setStatus('processing')
+          store.setProgress(0, 'Loading Whisper model…')
+          await whisperFacade.load(modelSize, (p, label) => store.setProgress(p, label))
+          store.setProgress(50, 'Transcribing…')
+          const result = await whisperFacade.transcribe(
+            store.inputFiles[0],
+            language || undefined
+          )
+          const blob = new Blob([result.text], { type: 'text/plain' })
+          const base = store.inputFiles[0].name.replace(/\.[^/.]+$/, '')
+          store.setResult(blob, `${base}_transcript.txt`)
+        } catch (err) {
+          store.setError(err instanceof Error ? err.message : String(err))
+        }
       }}
     />
   )
@@ -354,12 +406,16 @@ function EqualizerPanel() {
     <EqualizerOptions
       onProcess={async (bands) => {
         if (!store.inputFiles[0]) { store.setError('No file selected'); return }
-        store.setStatus('processing')
-        store.setProgress(10, 'Applying equalizer…')
-        const blob = await equalizerFacade.apply(store.inputFiles[0], bands)
-        store.setProgress(100)
-        const base = store.inputFiles[0].name.replace(/\.[^/.]+$/, '')
-        store.setResult(blob, `${base}_eq.wav`)
+        try {
+          store.setStatus('processing')
+          store.setProgress(10, 'Applying equalizer…')
+          const blob = await equalizerFacade.apply(store.inputFiles[0], bands)
+          store.setProgress(100)
+          const base = store.inputFiles[0].name.replace(/\.[^/.]+$/, '')
+          store.setResult(blob, `${base}_eq.wav`)
+        } catch (err) {
+          store.setError(err instanceof Error ? err.message : String(err))
+        }
       }}
     />
   )
@@ -384,10 +440,14 @@ function VocalRemovePanel() {
     <VocalRemoverOptions
       onProcess={async () => {
         if (!store.inputFiles[0]) { store.setError('No file selected'); return }
-        await ensureFFmpeg(store.setStatus, store.setProgress)
-        const blob = await ffmpegFacade.removeVocals(store.inputFiles[0])
-        const base = store.inputFiles[0].name.replace(/\.[^/.]+$/, '')
-        store.setResult(blob, `${base}_instrumental.mp3`)
+        try {
+          await ensureFFmpeg(store.setStatus, store.setProgress)
+          const blob = await ffmpegFacade.removeVocals(store.inputFiles[0])
+          const base = store.inputFiles[0].name.replace(/\.[^/.]+$/, '')
+          store.setResult(blob, `${base}_instrumental.mp3`)
+        } catch (err) {
+          store.setError(err instanceof Error ? err.message : String(err))
+        }
       }}
     />
   )

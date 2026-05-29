@@ -30,6 +30,10 @@ class FFmpegFacade {
     }
   }
 
+  isLoaded(): boolean {
+    return this.loaded
+  }
+
   private get instance(): FFmpeg {
     if (!this.ffmpeg || !this.loaded) {
       throw new Error('FFmpeg is not loaded. Call ffmpegFacade.load() first.')
