@@ -3,10 +3,10 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Pricing — Free & Pro Plans',
   description:
-    'Audflo is free to use. Upgrade to Pro for unlimited operations, 500 MB files, batch processing, and Developer API access. No hidden fees.',
+    'Wavlovesme is free to use. Upgrade to Pro for unlimited operations, 500 MB files, batch processing, and Developer API access. No hidden fees.',
   alternates: { canonical: '/pricing' },
   openGraph: {
-    title: 'Pricing | Audflo',
+    title: 'Pricing | Wavlovesme',
     description: 'Start free. Upgrade to Pro for unlimited audio processing. Simple, transparent pricing.',
     url: '/pricing',
   },

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import type { Tool } from '@/types/tool.types'
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://audflo.app'
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://wavlovesme.com'
 
 const TOOL_META: Record<string, { title: string; description: string; keywords: string[] }> = {
   convert: {
@@ -111,7 +111,7 @@ export function getToolMetadata(tool: Tool): Metadata {
     keywords: meta.keywords,
     alternates: { canonical: `/tools/${tool.slug}` },
     openGraph: {
-      title: `${meta.title} | Audflo`,
+      title: `${meta.title} | Wavlovesme`,
       description: meta.description,
       url: `/tools/${tool.slug}`,
       type: 'website',
@@ -128,7 +128,7 @@ export function getToolJsonLd(tool: Tool) {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
-    name: `${tool.name} — Audflo`,
+    name: `${tool.name} — Wavlovesme`,
     url: `${APP_URL}/tools/${tool.slug}`,
     description: TOOL_META[tool.slug]?.description ?? tool.description,
     applicationCategory: 'MultimediaApplication',
@@ -147,7 +147,7 @@ export function getLandingJsonLd() {
     {
       '@context': 'https://schema.org',
       '@type': 'WebSite',
-      name: 'Audflo',
+      name: 'Wavlovesme',
       url: APP_URL,
       description: 'Free online audio toolkit — 19 browser-based audio tools. Convert, trim, transcribe, and enhance audio with zero upload.',
       potentialAction: {
@@ -159,7 +159,7 @@ export function getLandingJsonLd() {
     {
       '@context': 'https://schema.org',
       '@type': 'SoftwareApplication',
-      name: 'Audflo',
+      name: 'Wavlovesme',
       url: APP_URL,
       applicationCategory: 'MultimediaApplication',
       operatingSystem: 'Any (Browser-based)',
@@ -181,15 +181,15 @@ export function getLandingJsonLd() {
       mainEntity: [
         {
           '@type': 'Question',
-          name: 'Does Audflo upload my audio to servers?',
+          name: 'Does Wavlovesme upload my audio to servers?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'No. All audio processing in Audflo runs entirely in your browser using WebAssembly. Your files never leave your device.',
+            text: 'No. All audio processing in Wavlovesme runs entirely in your browser using WebAssembly. Your files never leave your device.',
           },
         },
         {
           '@type': 'Question',
-          name: 'Is Audflo free to use?',
+          name: 'Is Wavlovesme free to use?',
           acceptedAnswer: {
             '@type': 'Answer',
             text: 'Yes. All 19 audio tools are free to use with a daily limit of 10 operations. Upgrade to Pro for unlimited use.',
@@ -197,10 +197,10 @@ export function getLandingJsonLd() {
         },
         {
           '@type': 'Question',
-          name: 'What audio formats does Audflo support?',
+          name: 'What audio formats does Wavlovesme support?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Audflo supports MP3, WAV, FLAC, OGG, M4A, AAC, OPUS, WebM, and can extract audio from MP4 and MKV video files.',
+            text: 'Wavlovesme supports MP3, WAV, FLAC, OGG, M4A, AAC, OPUS, WebM, and can extract audio from MP4 and MKV video files.',
           },
         },
       ],

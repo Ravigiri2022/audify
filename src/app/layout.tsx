@@ -11,13 +11,13 @@ const inter = Inter({
   display: 'swap',
 })
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://audflo.app'
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://wavlovesme.com'
 
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
   title: {
-    default: 'Audflo — Free Online Audio Tools',
-    template: '%s | Audflo',
+    default: 'Wavlovesme — Free Online Audio Tools',
+    template: '%s | Wavlovesme',
   },
   description:
     'Free online audio toolkit. Convert, trim, compress, transcribe, remove background noise and more — all processed in your browser. No upload. No servers. 100% private.',
@@ -40,11 +40,11 @@ export const metadata: Metadata = {
     'vocal remover online',
     'bpm detector online',
     'audio waveform visualizer',
-    'audflo',
+    'wavlovesme',
   ],
-  authors: [{ name: 'Audflo' }],
-  creator: 'Audflo',
-  publisher: 'Audflo',
+  authors: [{ name: 'Wavlovesme' }],
+  creator: 'Wavlovesme',
+  publisher: 'Wavlovesme',
   category: 'Technology',
   robots: {
     index: true,
@@ -55,8 +55,8 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: APP_URL,
-    siteName: 'Audflo',
-    title: 'Audflo — Free Online Audio Tools',
+    siteName: 'Wavlovesme',
+    title: 'Wavlovesme — Free Online Audio Tools',
     description:
       'Convert, trim, transcribe, and enhance audio — 100% in your browser. No upload. No servers. 19 free audio tools.',
     images: [
@@ -64,15 +64,15 @@ export const metadata: Metadata = {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Audflo — Free Online Audio Tools',
+        alt: 'Wavlovesme — Free Online Audio Tools',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    site: '@audflo',
-    creator: '@audflo',
-    title: 'Audflo — Free Online Audio Tools',
+    site: '@wavlovesme',
+    creator: '@wavlovesme',
+    title: 'Wavlovesme — Free Online Audio Tools',
     description:
       'Convert, trim, transcribe, and enhance audio — 100% in your browser. No upload. No servers. 19 free audio tools.',
     images: ['/og-image.png'],

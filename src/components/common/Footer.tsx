@@ -43,7 +43,7 @@ export function Footer() {
         </div>
 
         <div className="mt-8 border-t border-bg-border pt-6 text-center">
-          <p className="text-xs text-text-muted">© 2025 Audflo. All rights reserved.</p>
+          <p className="text-xs text-text-muted">© 2025 Wavlovesme. All rights reserved.</p>
         </div>
       </div>
     </footer>

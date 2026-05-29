@@ -20,7 +20,7 @@ import { apiKeysApi, usageApi } from '@/api'
 import type { ApiKey } from '@/types/api.types'
 import { fadeUp, stagger, easeOut } from '@/lib/motion'
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://audflo.app'
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://wavlovesme.com'
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false)
@@ -98,7 +98,7 @@ export default function ApiKeysPage() {
           <div>
             <h1 className="text-xl font-bold text-text-primary">API access is a Pro feature</h1>
             <p className="mt-2 text-sm text-text-secondary">
-              Upgrade to Pro to generate API keys, automate audio processing, and integrate Audflo
+              Upgrade to Pro to generate API keys, automate audio processing, and integrate Wavlovesme
               into your workflows.
             </p>
           </div>

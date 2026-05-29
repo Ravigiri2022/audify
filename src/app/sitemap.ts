@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next'
 import { TOOLS } from '@/lib/constants'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = process.env.NEXT_PUBLIC_APP_URL ?? 'https://audflo.app'
+  const base = process.env.NEXT_PUBLIC_APP_URL ?? 'https://wavlovesme.com'
   const now = new Date()
 
   const staticRoutes: MetadataRoute.Sitemap = [

@@ -61,14 +61,14 @@ export async function POST(request: NextRequest) {
   const id = randomBytes(8).toString('hex')
   const tmpDir = os.tmpdir()
   const tempPaths: string[] = []
-  const outputPath = path.join(tmpDir, `audflo_merge_out_${id}.${firstExt}`)
+  const outputPath = path.join(tmpDir, `wavlovesme_merge_out_${id}.${firstExt}`)
 
   try {
     // Write all input files to temp disk
     for (let idx = 0; idx < files.length; idx++) {
       const file = files[idx]
       const ext = file.name.includes('.') ? file.name.split('.').pop()!.toLowerCase() : 'bin'
-      const tmpPath = path.join(tmpDir, `audflo_merge_in_${id}_${idx}.${ext}`)
+      const tmpPath = path.join(tmpDir, `wavlovesme_merge_in_${id}_${idx}.${ext}`)
       const buf = Buffer.from(await file.arrayBuffer())
       await fs.writeFile(tmpPath, buf)
       tempPaths.push(tmpPath)
