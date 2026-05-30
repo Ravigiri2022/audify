@@ -1,6 +1,8 @@
-import { FFmpeg } from '@ffmpeg/ffmpeg'
-import { fetchFile } from '@ffmpeg/util'
+import type { FFmpeg } from '@ffmpeg/ffmpeg'
 import { FFMPEG_CORE_URL, FFMPEG_WASM_URL } from '@/lib/constants'
+
+// fetchFile is browser-only; loaded lazily alongside FFmpeg
+let fetchFile: (file: File) => Promise<Uint8Array>
 
 class FFmpegFacade {
   private ffmpeg: FFmpeg | null = null
@@ -10,6 +12,12 @@ class FFmpegFacade {
     if (this.loaded) return
 
     try {
+      const [{ FFmpeg }, util] = await Promise.all([
+        import('@ffmpeg/ffmpeg'),
+        import('@ffmpeg/util'),
+      ])
+      fetchFile = util.fetchFile
+
       this.ffmpeg = new FFmpeg()
 
       if (onProgress) {
