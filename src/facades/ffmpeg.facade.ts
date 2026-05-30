@@ -1,5 +1,5 @@
 import { FFmpeg } from '@ffmpeg/ffmpeg'
-import { fetchFile, toBlobURL } from '@ffmpeg/util'
+import { fetchFile } from '@ffmpeg/util'
 import { FFMPEG_CORE_URL, FFMPEG_WASM_URL } from '@/lib/constants'
 
 class FFmpegFacade {
@@ -18,10 +18,7 @@ class FFmpegFacade {
         })
       }
 
-      const coreURL = await toBlobURL(FFMPEG_CORE_URL, 'text/javascript')
-      const wasmURL = await toBlobURL(FFMPEG_WASM_URL, 'application/wasm')
-
-      await this.ffmpeg.load({ coreURL, wasmURL })
+      await this.ffmpeg.load({ coreURL: FFMPEG_CORE_URL, wasmURL: FFMPEG_WASM_URL })
       this.loaded = true
     } catch (err) {
       this.ffmpeg = null
