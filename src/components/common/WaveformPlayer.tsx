@@ -205,6 +205,10 @@ export function WaveformPlayer({ blob, label, className, height = 80, overlay }:
         {overlay && !isLoading && duration > 0 && (
           <div className="absolute inset-0 z-10 overflow-hidden pointer-events-none">
             <OverlayRenderer overlay={overlay} duration={duration} />
+            {/* Remind user this is just a preview, not the processed result */}
+            <span className="absolute bottom-1.5 right-2 rounded bg-black/60 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white/70 backdrop-blur-sm">
+              preview
+            </span>
           </div>
         )}
 

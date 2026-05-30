@@ -108,9 +108,11 @@ export default function TrimmerOptions({ onProcess, duration = 0 }: TrimmerOptio
         <p className="text-xs text-text-muted">Upload an audio file to see the trim controls.</p>
       )}
 
-      <Button onClick={() => onProcess(start, end)} disabled={!isValid} className="w-full">
-        Trim · Keep {formatDuration(trimmedDuration)}
-      </Button>
+      <div className="sticky bottom-0 -mx-4 border-t border-bg-border/60 bg-bg-surface px-4 pb-4 pt-3">
+        <Button onClick={() => onProcess(start, end)} disabled={!isValid} className="w-full">
+          Trim · Keep {formatDuration(trimmedDuration)}
+        </Button>
+      </div>
     </div>
   )
 }

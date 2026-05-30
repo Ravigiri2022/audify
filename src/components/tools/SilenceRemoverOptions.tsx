@@ -97,9 +97,11 @@ export default function SilenceRemoverOptions({ onProcess }: SilenceRemoverOptio
         <span className="font-medium text-text-primary">longer than {minDuration}s</span>.
       </div>
 
-      <Button onClick={() => onProcess(threshold, minDuration)} className="w-full">
-        Remove Silence
-      </Button>
+      <div className="sticky bottom-0 -mx-4 border-t border-bg-border/60 bg-bg-surface px-4 pb-4 pt-3">
+        <Button onClick={() => onProcess(threshold, minDuration)} className="w-full">
+          Remove Silence
+        </Button>
+      </div>
     </div>
   )
 }

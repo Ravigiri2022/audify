@@ -98,11 +98,13 @@ export default function FadeOptions({ onProcess, duration = 0 }: FadeOptionsProp
         <p className="text-xs text-text-muted">Set at least one fade to enable processing.</p>
       )}
 
-      <Button onClick={() => onProcess(fadeIn, fadeOut)} disabled={fadeIn === 0 && fadeOut === 0} className="w-full">
-        Apply{fadeIn > 0 && fadeOut > 0 ? ` · In ${fadeIn}s + Out ${fadeOut}s`
-          : fadeIn > 0 ? ` · Fade In ${fadeIn}s`
-          : fadeOut > 0 ? ` · Fade Out ${fadeOut}s` : ''}
-      </Button>
+      <div className="sticky bottom-0 -mx-4 border-t border-bg-border/60 bg-bg-surface px-4 pb-4 pt-3">
+        <Button onClick={() => onProcess(fadeIn, fadeOut)} disabled={fadeIn === 0 && fadeOut === 0} className="w-full">
+          Apply{fadeIn > 0 && fadeOut > 0 ? ` · In ${fadeIn}s + Out ${fadeOut}s`
+            : fadeIn > 0 ? ` · Fade In ${fadeIn}s`
+            : fadeOut > 0 ? ` · Fade Out ${fadeOut}s` : ''}
+        </Button>
+      </div>
     </div>
   )
 }

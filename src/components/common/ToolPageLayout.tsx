@@ -7,6 +7,7 @@ import {
   VolumeX, Gauge, Music, Sunrise, Columns, Wind, FileText,
   Info, Activity, BarChart2, AudioLines, Mic, UserMinus,
   LucideIcon, CheckCircle2, ArrowLeft, Download,
+  ChevronDown, ChevronUp, FileAudio,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -25,8 +26,8 @@ const ICON_MAP: Record<string, LucideIcon> = {
   Info, Activity, BarChart2, AudioLines, Mic, UserMinus,
 }
 
-function StepRow({ n, label, done = false, active = false }: {
-  n: number; label: string; done?: boolean; active?: boolean
+function StepRow({ n, label, done = false, active = false, aside }: {
+  n: number; label: string; done?: boolean; active?: boolean; aside?: React.ReactNode
 }) {
   return (
     <div className="flex items-center gap-2.5 mb-3">
@@ -37,11 +38,12 @@ function StepRow({ n, label, done = false, active = false }: {
         {done ? <CheckCircle2 size={11} /> : n}
       </span>
       <span className={cn(
-        'text-xs font-semibold uppercase tracking-widest transition-colors',
+        'flex-1 text-xs font-semibold uppercase tracking-widest transition-colors',
         done ? 'text-success' : active ? 'text-text-primary' : 'text-text-muted',
       )}>
         {label}
       </span>
+      {aside}
     </div>
   )
 }
@@ -54,6 +56,8 @@ interface ToolPageLayoutProps {
 
 export default function ToolPageLayout({ tool, children, acceptsMultiple = false }: ToolPageLayoutProps) {
   const [drawerOpen, setDrawerOpen] = React.useState(false)
+  const [uploadCollapsed, setUploadCollapsed] = React.useState(false)
+  const prevHasInput = React.useRef(false)
 
   const {
     status, progress, progressLabel,
@@ -66,25 +70,44 @@ export default function ToolPageLayout({ tool, children, acceptsMultiple = false
   const isDone = status === 'done'
   const hasInput = inputFiles.length > 0
   const primaryInputFile = inputFiles[0] ?? null
+  const isMulti = !!(acceptsMultiple || tool.acceptsMultiple)
+
+  // Auto-collapse dropzone when first file arrives
+  React.useEffect(() => {
+    if (inputFiles.length > 0 && !prevHasInput.current) {
+      setUploadCollapsed(true)
+    }
+    prevHasInput.current = inputFiles.length > 0
+  }, [inputFiles.length])
 
   // Auto-open drawer when processing finishes
   React.useEffect(() => {
     if (isDone && outputBlob) setDrawerOpen(true)
   }, [isDone, outputBlob])
 
+  // For multi-file tools: APPEND new files instead of replacing
+  function handleFiles(newFiles: File[]) {
+    if (isMulti) {
+      const merged = [
+        ...inputFiles,
+        ...newFiles.filter(
+          (f) => !inputFiles.some((e) => e.name === f.name && e.size === f.size),
+        ),
+      ]
+      setInputFiles(merged)
+    } else {
+      setInputFiles(newFiles)
+    }
+  }
+
   return (
     <div className="flex min-h-screen flex-col bg-bg-base">
 
       {/* ── Top bar ── */}
       <header className="flex h-12 shrink-0 items-center gap-2 border-b border-bg-border bg-bg-surface px-3 lg:px-4">
-        {/* Back */}
         <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" asChild>
-          <Link href="/tools" aria-label="Back to tools">
-            <ArrowLeft size={16} />
-          </Link>
+          <Link href="/tools" aria-label="Back to tools"><ArrowLeft size={16} /></Link>
         </Button>
-
-        {/* Tool icon + name */}
         <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-brand/25 to-brand-secondary/25 ring-1 ring-brand/30">
           <IconComponent className="h-3.5 w-3.5 text-brand" />
         </div>
@@ -92,8 +115,6 @@ export default function ToolPageLayout({ tool, children, acceptsMultiple = false
           <h1 className="shrink-0 text-sm font-bold text-text-primary">{tool.name}</h1>
           <span className="hidden truncate text-xs text-text-muted sm:block">{tool.description}</span>
         </div>
-
-        {/* Download button — top right */}
         <Button
           size="sm"
           variant={isDone ? 'default' : 'outline'}
@@ -114,13 +135,40 @@ export default function ToolPageLayout({ tool, children, acceptsMultiple = false
 
           {/* Step 1 — Upload */}
           <section className="border-b border-bg-border p-4">
-            <StepRow n={1} label="Upload" done={hasInput} active={!hasInput} />
-            <FileSizeGuard fileSize={primaryInputFile?.size ?? null}>
-              <AudioDropzone
-                onFiles={setInputFiles}
-                multiple={acceptsMultiple || tool.acceptsMultiple}
-              />
-            </FileSizeGuard>
+            <StepRow
+              n={1} label="Upload" done={hasInput} active={!hasInput}
+              aside={hasInput ? (
+                <button
+                  onClick={() => setUploadCollapsed((v) => !v)}
+                  className="ml-auto rounded p-0.5 text-text-muted hover:text-text-primary transition-colors"
+                  aria-label={uploadCollapsed ? 'Expand upload' : 'Collapse upload'}
+                >
+                  {uploadCollapsed ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
+                </button>
+              ) : undefined}
+            />
+
+            {/* Collapsed summary */}
+            {hasInput && uploadCollapsed ? (
+              <button
+                type="button"
+                onClick={() => setUploadCollapsed(false)}
+                className="flex w-full items-center gap-2 rounded-lg border border-bg-border bg-bg-elevated px-3 py-2 text-left hover:bg-bg-border/50 transition-colors"
+              >
+                <FileAudio size={13} className="shrink-0 text-brand" />
+                <span className="flex-1 truncate text-xs text-text-secondary">
+                  {inputFiles.length === 1 ? inputFiles[0].name : `${inputFiles.length} files loaded`}
+                </span>
+                <ChevronDown size={13} className="shrink-0 text-text-muted" />
+              </button>
+            ) : (
+              <FileSizeGuard fileSize={primaryInputFile?.size ?? null}>
+                <AudioDropzone
+                  onFiles={handleFiles}
+                  multiple={isMulti}
+                />
+              </FileSizeGuard>
+            )}
           </section>
 
           {/* Step 2 — Configure */}
@@ -139,14 +187,13 @@ export default function ToolPageLayout({ tool, children, acceptsMultiple = false
             )}
           </section>
 
-          {/* Guest banner */}
           {hasInput && (
             <div className="border-b border-bg-border px-4 py-3">
               <GuestBanner />
             </div>
           )}
 
-          {/* Ad space — bottom of rail */}
+          {/* Ad space */}
           <div className="p-3 mt-auto">
             <p className="mb-1.5 text-[10px] uppercase tracking-wider text-text-muted/40 select-none">Sponsored</p>
             <div
@@ -161,8 +208,6 @@ export default function ToolPageLayout({ tool, children, acceptsMultiple = false
 
         {/* ── Right workspace ── */}
         <main className="flex flex-1 flex-col gap-4 overflow-y-auto p-4 lg:p-5">
-
-          {/* Empty state */}
           {!hasInput && (
             <div className="flex flex-1 flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-bg-border py-24 text-center">
               <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-bg-elevated ring-1 ring-bg-border">
@@ -170,21 +215,16 @@ export default function ToolPageLayout({ tool, children, acceptsMultiple = false
               </div>
               <div>
                 <p className="text-sm font-semibold text-text-muted">No audio loaded</p>
-                <p className="mt-1 text-xs text-text-muted/60">
-                  Upload a file on the left — it will appear here for preview
-                </p>
+                <p className="mt-1 text-xs text-text-muted/60">Upload a file on the left — it will appear here for preview</p>
               </div>
             </div>
           )}
 
-          {/* ── Input track ── */}
           {hasInput && (
             <div className="overflow-hidden rounded-2xl border border-bg-border bg-bg-surface">
               <div className="flex items-center gap-2 border-b border-bg-border/60 bg-bg-elevated/50 px-4 py-2">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-text-muted">Input</span>
-                <span className="ml-1 flex-1 truncate font-mono text-xs text-text-secondary">
-                  {primaryInputFile?.name}
-                </span>
+                <span className="ml-1 flex-1 truncate font-mono text-xs text-text-secondary">{primaryInputFile?.name}</span>
                 {primaryInputFile && (
                   <span className="shrink-0 text-[10px] font-mono text-text-muted">
                     {(primaryInputFile.size / 1024 / 1024).toFixed(1)} MB
@@ -192,31 +232,21 @@ export default function ToolPageLayout({ tool, children, acceptsMultiple = false
                 )}
               </div>
               <div className="p-4">
-                <WaveformPlayer
-                  blob={primaryInputFile}
-                  height={128}
-                  overlay={inputOverlay}
-                />
+                <WaveformPlayer blob={primaryInputFile} height={128} overlay={inputOverlay} />
               </div>
             </div>
           )}
 
-          {/* ── Processing ── */}
           {isProcessing && (
             <ProcessingOverlay status={status} progress={progress} label={progressLabel} />
           )}
 
-          {/* ── Output track ── */}
           {isDone && outputBlob && (
             <div className="overflow-hidden rounded-2xl border border-brand/30 bg-bg-surface shadow-glow">
               <div className="flex items-center gap-2 border-b border-brand/15 bg-brand/5 px-4 py-2">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-brand">Output</span>
-                <span className="ml-1 flex-1 truncate font-mono text-xs text-text-secondary">
-                  {outputFilename}
-                </span>
-                <span className="shrink-0 rounded-full bg-success/15 px-2 py-0.5 text-[10px] font-bold text-success">
-                  Ready
-                </span>
+                <span className="ml-1 flex-1 truncate font-mono text-xs text-text-secondary">{outputFilename}</span>
+                <span className="shrink-0 rounded-full bg-success/15 px-2 py-0.5 text-[10px] font-bold text-success">Ready</span>
               </div>
               <div className="p-4">
                 <WaveformPlayer blob={outputBlob} height={128} />
@@ -226,7 +256,6 @@ export default function ToolPageLayout({ tool, children, acceptsMultiple = false
         </main>
       </div>
 
-      {/* ── Download drawer ── */}
       <DownloadDrawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}

@@ -125,15 +125,13 @@ export default function MergerOptions({ onProcess }: MergerOptionsProps) {
         </div>
       </div>
 
-      <Button
-        onClick={() => onProcess(crossfade)}
-        disabled={needsMore}
-        className="w-full"
-      >
-        {needsMore
-          ? `Need ${2 - inputFiles.length} more file${2 - inputFiles.length !== 1 ? 's' : ''}`
-          : `Merge ${inputFiles.length} tracks${crossfade > 0 ? ` · ${crossfade}s crossfade` : ''}`}
-      </Button>
+      <div className="sticky bottom-0 -mx-4 border-t border-bg-border/60 bg-bg-surface px-4 pb-4 pt-3">
+        <Button onClick={() => onProcess(crossfade)} disabled={needsMore} className="w-full">
+          {needsMore
+            ? `Need ${2 - inputFiles.length} more file${2 - inputFiles.length !== 1 ? 's' : ''}`
+            : `Merge ${inputFiles.length} tracks${crossfade > 0 ? ` · ${crossfade}s crossfade` : ''}`}
+        </Button>
+      </div>
     </div>
   )
 }

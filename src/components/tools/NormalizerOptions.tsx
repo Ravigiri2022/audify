@@ -72,9 +72,11 @@ export default function NormalizerOptions({ onProcess }: NormalizerOptionsProps)
         </div>
       </div>
 
-      <Button onClick={() => onProcess(targetLufs)} className="w-full">
-        Normalize to {targetLufs} LUFS
-      </Button>
+      <div className="sticky bottom-0 -mx-4 border-t border-bg-border/60 bg-bg-surface px-4 pb-4 pt-3">
+        <Button onClick={() => onProcess(targetLufs)} className="w-full">
+          Normalize to {targetLufs} LUFS
+        </Button>
+      </div>
     </div>
   )
 }
