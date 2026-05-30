@@ -1,9 +1,11 @@
 'use client'
 
 import * as React from 'react'
-import { X, Download, FileAudio, Shield, Clock } from 'lucide-react'
+import { X, Download, FileAudio, Shield, Clock, BookmarkPlus, Lock, Crown } from 'lucide-react'
 import { cn, downloadBlob } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import Link from 'next/link'
+import { useAuthStore } from '@/store/auth.store'
 
 interface DownloadDrawerProps {
   open: boolean
@@ -20,6 +22,8 @@ function formatBytes(bytes: number): string {
 }
 
 export function DownloadDrawer({ open, onClose, blob, filename, toolName }: DownloadDrawerProps) {
+  const { profile } = useAuthStore()
+  const isPro = profile?.plan === 'pro'
   const ext = filename.split('.').pop()?.toUpperCase() ?? '—'
   const size = blob ? formatBytes(blob.size) : '—'
 
@@ -108,6 +112,30 @@ export function DownloadDrawer({ open, onClose, blob, filename, toolName }: Down
             <Download size={16} />
             Download {ext}
           </Button>
+
+          {/* Save to Library — Pro only */}
+          <div className="relative">
+            {!isPro && (
+              <div className="absolute inset-0 z-10 flex items-center justify-center rounded-xl">
+                <Link
+                  href="/pricing"
+                  onClick={onClose}
+                  className="flex items-center gap-1.5 rounded-full border border-brand/30 bg-bg-surface/90 px-3 py-1.5 text-xs font-semibold text-brand backdrop-blur-sm hover:bg-brand/10 transition-colors"
+                >
+                  <Crown size={11} />
+                  Upgrade to Pro to save online
+                </Link>
+              </div>
+            )}
+            <Button
+              variant="outline"
+              className={cn('w-full gap-2', !isPro && 'opacity-30 pointer-events-none')}
+              disabled={!isPro || !blob}
+            >
+              {!isPro ? <Lock size={14} /> : <BookmarkPlus size={14} />}
+              Save to Library
+            </Button>
+          </div>
 
           {/* Privacy note */}
           <div className="flex items-start gap-2.5 rounded-xl border border-success/20 bg-success/5 px-3 py-3">
