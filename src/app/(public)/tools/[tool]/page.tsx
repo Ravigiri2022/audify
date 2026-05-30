@@ -17,7 +17,7 @@ import ConverterOptions from '@/components/tools/ConverterOptions'
 import TrimmerOptions from '@/components/tools/TrimmerOptions'
 import CompressorOptions from '@/components/tools/CompressorOptions'
 import MergerOptions from '@/components/tools/MergerOptions'
-import SplitterOptions from '@/components/tools/SplitterOptions'
+import SplitterOptions, { type SplitSegment } from '@/components/tools/SplitterOptions'
 import NormalizerOptions from '@/components/tools/NormalizerOptions'
 import SilenceRemoverOptions from '@/components/tools/SilenceRemoverOptions'
 import SpeedChangerOptions from '@/components/tools/SpeedChangerOptions'
@@ -145,22 +145,29 @@ function MergePanel() {
 function SplitPanel() {
   const store = useToolStore()
   const duration = useAudioDuration(store.inputFiles[0] ?? null)
+  const [segments, setSegments] = useState<SplitSegment[]>([])
+
   return (
     <SplitterOptions
       duration={duration}
+      results={segments.length > 0 ? segments : undefined}
       onProcess={async (timestamps) => {
         if (!store.inputFiles[0]) { store.setError('No file selected'); return }
+        setSegments([])
         try {
           await ensureFFmpeg(store.setStatus, store.setProgress)
           const blobs = await ffmpegFacade.split(store.inputFiles[0], timestamps)
           const base = store.inputFiles[0].name.replace(/\.[^/.]+$/, '')
-          blobs.forEach((blob, i) => {
-            const a = document.createElement('a')
-            a.href = URL.createObjectURL(blob)
-            a.download = `${base}_part${i + 1}.mp3`
-            a.click()
-            setTimeout(() => URL.revokeObjectURL(a.href), 1000)
-          })
+          const cuts = [0, ...timestamps, duration]
+          const newSegments: SplitSegment[] = blobs.map((blob, i) => ({
+            blob,
+            filename: `${base}_part${i + 1}.mp3`,
+            index: i,
+            startTime: cuts[i] ?? 0,
+            endTime: cuts[i + 1] ?? duration,
+          }))
+          setSegments(newSegments)
+          // Mark done so the output waveform shows the first segment
           store.setResult(blobs[0], `${base}_part1.mp3`)
         } catch (err) {
           store.setError(err instanceof Error ? err.message : String(err))
