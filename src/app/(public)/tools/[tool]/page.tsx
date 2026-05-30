@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Navbar } from '@/components/common/Navbar'
-import { Footer } from '@/components/common/Footer'
 import ToolPageLayout from '@/components/common/ToolPageLayout'
 import { TOOLS } from '@/lib/constants'
 import type { ToolSlug } from '@/types/tool.types'
@@ -512,7 +511,7 @@ export default function ToolPage() {
   const PanelComponent = PANEL_MAP[tool.slug as ToolSlug]
 
   return (
-    <div className="min-h-screen bg-bg-base">
+    <>
       <Navbar />
       <ToolPageLayout tool={tool} acceptsMultiple={tool.acceptsMultiple}>
         {PanelComponent ? (
@@ -527,7 +526,6 @@ export default function ToolPage() {
           </motion.div>
         ) : null}
       </ToolPageLayout>
-      <Footer />
-    </div>
+    </>
   )
 }
