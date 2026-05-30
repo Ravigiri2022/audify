@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useAudioDuration } from '@/hooks/useAudioDuration'
 import { useParams, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Navbar } from '@/components/common/Navbar'
@@ -143,8 +144,10 @@ function MergePanel() {
 
 function SplitPanel() {
   const store = useToolStore()
+  const duration = useAudioDuration(store.inputFiles[0] ?? null)
   return (
     <SplitterOptions
+      duration={duration}
       onProcess={async (timestamps) => {
         if (!store.inputFiles[0]) { store.setError('No file selected'); return }
         try {
@@ -246,8 +249,10 @@ function PitchPanel() {
 
 function FadePanel() {
   const store = useToolStore()
+  const duration = useAudioDuration(store.inputFiles[0] ?? null)
   return (
     <FadeOptions
+      duration={duration}
       onProcess={async (fadeInSec, fadeOutSec) => {
         if (!store.inputFiles[0]) { store.setError('No file selected'); return }
         try {

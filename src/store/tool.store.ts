@@ -2,6 +2,11 @@
 import { create } from 'zustand'
 import type { ToolStatus } from '@/types/tool.types'
 
+export type WaveformOverlayConfig =
+  | { type: 'trim'; start: number; end: number; duration: number }
+  | { type: 'fade'; fadeIn: number; fadeOut: number; duration: number }
+  | { type: 'split'; timestamps: number[]; duration: number }
+
 interface ToolStore {
   status: ToolStatus
   progress: number
@@ -11,11 +16,13 @@ interface ToolStore {
   outputFilename: string
   errorMessage: string | null
   processingStartTime: number | null
+  inputOverlay: WaveformOverlayConfig | null
   setInputFiles: (files: File[]) => void
   setProgress: (p: number, label?: string) => void
   setResult: (blob: Blob, filename: string) => void
   setError: (msg: string) => void
   setStatus: (s: ToolStatus) => void
+  setInputOverlay: (overlay: WaveformOverlayConfig | null) => void
   reset: () => void
 }
 
@@ -28,6 +35,7 @@ const initialState = {
   outputFilename: '',
   errorMessage: null,
   processingStartTime: null,
+  inputOverlay: null,
 }
 
 export const useToolStore = create<ToolStore>((set) => ({
@@ -42,18 +50,9 @@ export const useToolStore = create<ToolStore>((set) => ({
     })),
 
   setResult: (blob, filename) =>
-    set({
-      outputBlob: blob,
-      outputFilename: filename,
-      status: 'done',
-      progress: 100,
-    }),
+    set({ outputBlob: blob, outputFilename: filename, status: 'done', progress: 100 }),
 
-  setError: (msg) =>
-    set({
-      errorMessage: msg,
-      status: 'error',
-    }),
+  setError: (msg) => set({ errorMessage: msg, status: 'error' }),
 
   setStatus: (s) =>
     set((state) => ({
@@ -63,6 +62,8 @@ export const useToolStore = create<ToolStore>((set) => ({
           ? Date.now()
           : state.processingStartTime,
     })),
+
+  setInputOverlay: (overlay) => set({ inputOverlay: overlay }),
 
   reset: () => set({ ...initialState }),
 }))
