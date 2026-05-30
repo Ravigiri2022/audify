@@ -26,7 +26,7 @@ class FFmpegFacade {
         })
       }
 
-      await this.ffmpeg.load({ coreURL: FFMPEG_CORE_URL, wasmURL: FFMPEG_WASM_URL })
+      await this.ffmpeg.load({ classWorkerURL: '/ffmpeg/worker.js', coreURL: FFMPEG_CORE_URL, wasmURL: FFMPEG_WASM_URL })
       this.loaded = true
     } catch (err) {
       this.ffmpeg = null
