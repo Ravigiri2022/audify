@@ -114,42 +114,40 @@ export function WaveformPlayer({ blob, label, className }: WaveformPlayerProps) 
         <p className="text-xs font-medium text-text-muted uppercase tracking-wider">{label}</p>
       )}
 
-      {isLoading ? (
-        <SkeletonLoader />
-      ) : (
-        <>
-          <div
-            ref={containerRef}
-            className="rounded-lg overflow-hidden bg-bg-elevated px-2 py-2"
-          />
+      {isLoading && <SkeletonLoader />}
 
-          <div className="flex items-center gap-3">
-            <Button
-              variant="secondary"
-              size="icon"
-              onClick={togglePlay}
-              aria-label={isPlaying ? 'Pause' : 'Play'}
-            >
-              {isPlaying ? <Pause size={16} /> : <Play size={16} />}
-            </Button>
+      <div className={isLoading ? 'hidden' : 'flex flex-col gap-3'}>
+        <div
+          ref={containerRef}
+          className="rounded-lg overflow-hidden bg-bg-elevated px-2 py-2"
+        />
 
-            <span className="text-xs tabular-nums text-text-muted shrink-0">
-              {formatDuration(currentTime)} / {formatDuration(duration)}
-            </span>
+        <div className="flex items-center gap-3">
+          <Button
+            variant="secondary"
+            size="icon"
+            onClick={togglePlay}
+            aria-label={isPlaying ? 'Pause' : 'Play'}
+          >
+            {isPlaying ? <Pause size={16} /> : <Play size={16} />}
+          </Button>
 
-            <div className="ml-auto flex items-center gap-2 w-24">
-              <Slider
-                min={0}
-                max={100}
-                step={1}
-                value={[volume]}
-                onValueChange={([v]) => setVolume(v)}
-                aria-label="Volume"
-              />
-            </div>
+          <span className="text-xs tabular-nums text-text-muted shrink-0">
+            {formatDuration(currentTime)} / {formatDuration(duration)}
+          </span>
+
+          <div className="ml-auto flex items-center gap-2 w-24">
+            <Slider
+              min={0}
+              max={100}
+              step={1}
+              value={[volume]}
+              onValueChange={([v]) => setVolume(v)}
+              aria-label="Volume"
+            />
           </div>
-        </>
-      )}
+        </div>
+      </div>
     </div>
   )
 }
