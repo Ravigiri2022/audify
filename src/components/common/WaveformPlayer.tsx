@@ -15,7 +15,7 @@ interface WaveformPlayerProps {
 function SkeletonLoader() {
   return (
     <div className="flex flex-col gap-3 animate-pulse">
-      <div className="h-24 rounded-lg bg-bg-elevated" />
+      <div className="h-[84px] rounded-lg bg-bg-elevated" />
       <div className="flex items-center gap-3">
         <div className="h-9 w-9 rounded bg-bg-elevated" />
         <div className="h-4 w-24 rounded bg-bg-elevated" />
@@ -70,22 +70,14 @@ export function WaveformPlayer({ blob, label, className }: WaveformPlayerProps) 
         ws!.setVolume(volume / 100)
       })
 
-      ws.on('audioprocess', () => {
-        setCurrentTime(ws!.getCurrentTime())
-      })
-
-      ws.on('seeking', () => {
-        setCurrentTime(ws!.getCurrentTime())
-      })
-
+      ws.on('audioprocess', () => setCurrentTime(ws!.getCurrentTime()))
+      ws.on('seeking', () => setCurrentTime(ws!.getCurrentTime()))
       ws.on('play', () => setIsPlaying(true))
       ws.on('pause', () => setIsPlaying(false))
       ws.on('finish', () => setIsPlaying(false))
 
       ws.load(objectUrl)
-    }).catch(() => {
-      setIsLoading(false)
-    })
+    }).catch(() => setIsLoading(false))
 
     return () => {
       URL.revokeObjectURL(objectUrl)
@@ -94,12 +86,10 @@ export function WaveformPlayer({ blob, label, className }: WaveformPlayerProps) 
         wsRef.current = null
       }
     }
-  }, [blob])
+  }, [blob]) // eslint-disable-line react-hooks/exhaustive-deps
 
   React.useEffect(() => {
-    if (wsRef.current) {
-      wsRef.current.setVolume(volume / 100)
-    }
+    if (wsRef.current) wsRef.current.setVolume(volume / 100)
   }, [volume])
 
   function togglePlay() {
@@ -114,14 +104,20 @@ export function WaveformPlayer({ blob, label, className }: WaveformPlayerProps) 
         <p className="text-xs font-medium text-text-muted uppercase tracking-wider">{label}</p>
       )}
 
-      {isLoading && <SkeletonLoader />}
-
-      <div className={isLoading ? 'hidden' : 'flex flex-col gap-3'}>
+      {/* Container always in DOM so WaveSurfer can mount — skeleton overlays it while loading */}
+      <div className="relative">
+        {isLoading && (
+          <div className="absolute inset-0 z-10">
+            <SkeletonLoader />
+          </div>
+        )}
         <div
           ref={containerRef}
-          className="rounded-lg overflow-hidden bg-bg-elevated px-2 py-2"
+          className="rounded-lg overflow-hidden bg-bg-elevated px-2 py-2 min-h-[84px]"
         />
+      </div>
 
+      {!isLoading && (
         <div className="flex items-center gap-3">
           <Button
             variant="secondary"
@@ -147,7 +143,7 @@ export function WaveformPlayer({ blob, label, className }: WaveformPlayerProps) 
             />
           </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }

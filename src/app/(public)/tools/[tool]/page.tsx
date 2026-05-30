@@ -74,8 +74,21 @@ function ConvertPanel() {
 
 function TrimPanel() {
   const store = useToolStore()
+  const [duration, setDuration] = useState(0)
+
+  useEffect(() => {
+    const file = store.inputFiles[0]
+    if (!file) { setDuration(0); return }
+    const url = URL.createObjectURL(file)
+    const audio = new Audio(url)
+    const onMeta = () => { setDuration(audio.duration); URL.revokeObjectURL(url) }
+    audio.addEventListener('loadedmetadata', onMeta)
+    return () => { audio.removeEventListener('loadedmetadata', onMeta); URL.revokeObjectURL(url) }
+  }, [store.inputFiles])
+
   return (
     <TrimmerOptions
+      duration={duration}
       onProcess={async (start, end) => {
         if (!store.inputFiles[0]) { store.setError('No file selected'); return }
         try {

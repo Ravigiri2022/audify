@@ -346,8 +346,8 @@ class FFmpegFacade {
         const fadeOutStart = durationSec - fadeOutSec
         filters.push(`afade=t=out:st=${fadeOutStart}:d=${fadeOutSec}`)
       } else if (fadeOutSec > 0) {
-        // Without known duration, rely on -sseof trick
-        filters.push(`afade=t=out:st=-${fadeOutSec}:d=${fadeOutSec}`)
+        // areverse trick: reverse → fade-in of Y sec → reverse back = fade-out at end
+        filters.push(`areverse,afade=t=in:st=0:d=${fadeOutSec},areverse`)
       }
 
       const afArg = filters.join(',')
